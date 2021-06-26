@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS "game" (
     "id" INTEGER NOT NULL UNIQUE,
     "token" TEXT NOT NULL UNIQUE,
     "current_position" INTEGER NOT NULL,
-    "deck" INTEGER NOT NULL,
-    "canvas" BLOB NOT NULL,
+    "deck" TEXT NOT NULL,
+    "canvas" TEXT NOT NULL,
     PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE TABLE IF NOT EXISTS "player" (
@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS "player" (
     "token" TEXT NOT NULL UNIQUE,
     "game_id" INTEGER NOT NULL,
     "position" INTEGER NOT NULL,
-    "hand" BLOB NOT NULL,
-    "palette" BLOB NOT NULL,
+    "hand" TEXT NOT NULL,
+    "palette" TEXT NOT NULL,
     PRIMARY KEY("id" AUTOINCREMENT),
     UNIQUE("position","game_id"),
     FOREIGN KEY("game_id") REFERENCES "game"("id")

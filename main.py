@@ -8,7 +8,7 @@ import random
 import sqlite3
 import random
 
-colour_values = {
+colour_names = {
     1: "Violet",
     2: "Indigo",
     3: "Blue",
@@ -18,27 +18,28 @@ colour_values = {
     7: "Red",
 }
 
+colour_codes = {value: name[0].lower() for (value, name) in colour_names.items()}
+
 
 class Game:
     @staticmethod
-    def _get_deck() -> bytearray:
-        cards = bytearray()
-        for number, colour in itertools.product(
-            random.sample(range(1, 8), 7), random.sample(range(1, 8), 7)
+    def _get_deck() -> str:
+        cards = ""
+        for colour, number in itertools.product(
+            random.sample(list(colour_codes.values()), 7), random.sample(range(1, 8), 7)
         ):
-            card = (number << 4) + colour
-            cards.append(number)
-            cards.append(colour)
+            cards += f"{colour}{number}"
+
         return cards
 
     def __init__(self, conn: sqlite3.Connection, player_count: int) -> None:
         self.token = secrets.token_hex()
         self.current_position = random.randrange(0, player_count)
-        deck: bytearray = Game._get_deck()
-        players: List[Tuple[bytearray, bytearray]] = []  # (Hand, Palette)
+        deck: str = Game._get_deck()
+        players: List[Tuple[str, str]] = []  # (Hand, Palette)
 
         for _ in range(player_count):
-            # Two bytes for every card so we need to double the hand count of 7
+            # Two characters for every card so we need to double the hand count of 7
             hand = deck[:14]
             palette = deck[14:16]
             players.append((hand, palette))
@@ -65,7 +66,7 @@ def get_name(number: int, colour: int) -> str:
     if colour == 0 or number == 0:
         raise RuntimeError("Invalid card supplied")
 
-    return f"{colour_values[colour]}{number}"
+    return f"{colour_names[colour]}{number}"
 
 
 def get_card_names(cards: bytes) -> List[str]:
