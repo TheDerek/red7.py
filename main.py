@@ -33,7 +33,6 @@ class Game:
         return cards
 
     def __init__(self, conn: sqlite3.Connection, player_count: int) -> None:
-        self.token = secrets.token_hex()
         self.current_position = random.randrange(0, player_count)
         deck: str = Game._get_deck()
         players: List[Tuple[str, str]] = []  # (Hand, Palette)
@@ -47,14 +46,13 @@ class Game:
 
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO game (token, current_position, deck, canvas) VALUES (?, ?, ?, ?)",
-            [self.token, self.current_position, deck, b""],
+            "INSERT INTO game (current_position, deck, canvas) VALUES (?, ?, ?)",
+            [self.current_position, deck, b""],
         )
         for position, player in enumerate(players):
-            player_token = secrets.token_hex()
             cur.execute(
-                "INSERT INTO player (token, game_id, position, hand, palette) VALUES (?, (select seq from sqlite_sequence where name='game'), ?, ?, ?)",
-                [player_token, position, player[0], player[1]],
+                "INSERT INTO player (game_id, position, hand, palette) VALUES (?, (select seq from sqlite_sequence where name='game'), ?, ?)",
+                [position, player[0], player[1]],
             )
         game_id = cur.execute("select seq from sqlite_sequence where name='game'")
         conn.commit()
