@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.9
 
-from typing import List
+from typing import List, Union
 import itertools
 import random
 import sqlite3
@@ -37,21 +37,41 @@ class Game:
         )
         return cards
 
-    def __init__(self, player_count: int) -> None:
-        self._id = None  # Indicate this is not in the database yet
-        self.current_position = random.randrange(0, player_count)
-        self.deck: Cards = Game._get_deck()
-        self.players: List[Player] = []  # (Hand, Palette)
+    @staticmethod
+    def new(player_count: int):
+        current_position = random.randrange(0, player_count)
+        deck: Cards = Game._get_deck()
+        players: List[Player] = []  # (Hand, Palette)
 
         for position in range(player_count):
-            self.players.append(
-                    Player(position, hand=self.deck[:7], palette=self.deck[7])
+            players.append(
+                Player(position, hand=deck[:7], palette=deck[7])  # type: ignore
             )
 
             # Reduce the deck the number of cards we delt to this player (8)
-            self.deck = self.deck[8:]
+            # type: ignore
+            deck = deck[8:]  # type: ignore
+
+        return Game(deck, Cards([]), players, current_position)
+
+    def __init__(
+        self,
+        deck: Cards,
+        canvas: Cards,
+        players: List[Player],
+        current_position: int,
+        id_: int = None,
+    ) -> None:
+        self.deck = deck
+        self.canvas = canvas
+        self.players = players
+        self.current_position = current_position
+        self._id = id_
 
     def create(self, conn: sqlite3.Connection) -> "Game":
+        if self._id:
+            raise RuntimeError("Game has already been created and written to database")
+
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO game (current_position, deck, canvas) VALUES (?, ?, ?)",
@@ -67,6 +87,15 @@ class Game:
         self._id = game_id.fetchone()[0]
         return self
 
+    def copy(self):
+        return Game(
+            self.deck,
+            self.canvas,
+            [player.copy() for player in self.players],
+            self.current_position,
+            self._id,
+        )
+
     @property
     def id(self) -> int:
         if self._id == None:
@@ -77,21 +106,22 @@ class Game:
     def current_player(self) -> Player:
         return self.players[self.current_position]
 
-    def play(self, card: str):
+    def _play(self, card: Card) -> "Game":
         if card not in self.current_player.hand:
             raise GameLogicError(
-                f"Player {self.current_player.position} does not have card {card} to play"
+                f"Player {self.current_player.position} does not have card {card} to play, cards={self.current_player.hand}"
             )
-        pass
 
-    def discard(self, card: str):
+        new_game = self.copy()
+
+    def discard(self, card: Card):
         if card not in self.current_player.hand:
             raise GameLogicError(
                 f"Player {self.current_player.position} does not have card {card} to discard"
             )
         pass
 
-    def play_and_discard(self, play_card: str, discard_card: str):
+    def play_and_discard(self, play_card: Card, discard_card: Card):
         if play_card == discard_card:
             raise GameLogicError("Cannot play and discard the same card")
 

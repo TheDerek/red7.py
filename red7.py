@@ -3,7 +3,8 @@
 import sqlite3
 import datetime
 
-from thederek.red7 import game
+from thederek.red7 import game, Card, Colour
+
 
 def create_database(schema: str):
     conn = sqlite3.connect(":memory:")
@@ -21,12 +22,12 @@ def copy_database(source_connection, dest_dbname=":memory:"):
     dest_conn.executescript(script)
     return dest_conn
 
+
 if __name__ == "__main__":
     conn = create_database(open("red7.sql").read())
 
-    game = game.Game(4).create(conn)
+    game = game.Game.new(4).create(conn)
     copy_database(conn, f"logs/{datetime.datetime.now().isoformat()}.db")
-    game.play("r6")
 
     print(game.id)
-    #copy_database(conn, f"logs/{datetime.datetime.now().isoformat()}.db")
+    # copy_database(conn, f"logs/{datetime.datetime.now().isoformat()}.db")

@@ -5,7 +5,7 @@ from thederek.red7 import Cards
 
 class Player:
     def __init__(self, position: int, hand: Cards, palette: Cards):
-        self.position = position
+        self.position: int = position
         self.hand: Cards = hand
         self.palette: Cards = palette
 
@@ -14,3 +14,6 @@ class Player:
             "INSERT INTO player (game_id, position, hand, palette) VALUES (?, (select seq from sqlite_sequence where name='game'), ?, ?)",
             [self.position, repr(self.hand), repr(self.palette)],
         )
+
+    def copy(self):
+        return Player(self.position, self.hand, self.palette)
