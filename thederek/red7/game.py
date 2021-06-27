@@ -1,10 +1,13 @@
 #!/usr/bin/env python3.9
 
-from typing import List 
+from typing import List
 import itertools
 import random
 import sqlite3
 import random
+
+from thederek.red7.player import Player
+from thederek.red7 import Card, Cards, Colour
 
 colour_names = {
     1: "Violet",
@@ -23,51 +26,36 @@ class GameLogicError(RuntimeError):
     pass
 
 
-class Player:
-    def __init__(self, position: int, hand: str, palette: str):
-        self.position = position
-        self.hand = hand
-        self.palette = palette
-
-    def create(self, cursor: sqlite3.Cursor):
-        cursor.execute(
-            "INSERT INTO player (game_id, position, hand, palette) VALUES (?, (select seq from sqlite_sequence where name='game'), ?, ?)",
-            [self.position, self.hand, self.palette],
-        )
-
-
 class Game:
     @staticmethod
-    def _get_deck() -> str:
-        cards = ""
-        for colour, number in itertools.product(
-            random.sample(list(colour_codes.values()), 7), random.sample(range(1, 8), 7)
-        ):
-            cards += f"{colour}{number}"
-
+    def _get_deck() -> Cards:
+        cards = Cards(
+            [
+                Card(number, colour)
+                for number, colour in itertools.product(range(1, 8), list(Colour))
+            ]
+        )
         return cards
 
     def __init__(self, player_count: int) -> None:
         self._id = None  # Indicate this is not in the database yet
         self.current_position = random.randrange(0, player_count)
-        self.deck: str = Game._get_deck()
+        self.deck: Cards = Game._get_deck()
         self.players: List[Player] = []  # (Hand, Palette)
 
         for position in range(player_count):
-            # Two characters for every card so we need to double the hand count of 7
-            # and the staring palette count of 1
             self.players.append(
-                Player(position, hand=self.deck[:14], palette=self.deck[14:16])
+                    Player(position, hand=self.deck[:7], palette=self.deck[7])
             )
 
             # Reduce the deck the number of cards we delt to this player (8)
-            self.deck = self.deck[16:]
+            self.deck = self.deck[8:]
 
     def create(self, conn: sqlite3.Connection) -> "Game":
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO game (current_position, deck, canvas) VALUES (?, ?, ?)",
-            [self.current_position, self.deck, ""],
+            [self.current_position, repr(self.deck), ""],
         )
 
         for player in self.players:
@@ -111,6 +99,9 @@ class Game:
         self.discard(discard_card)
 
     def do_nothing(self):
+        pass
+
+    def is_current_player_winning(self):
         pass
 
 

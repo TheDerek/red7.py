@@ -25,7 +25,8 @@ if __name__ == "__main__":
     conn = create_database(open("red7.sql").read())
 
     game = game.Game(4).create(conn)
+    copy_database(conn, f"logs/{datetime.datetime.now().isoformat()}.db")
     game.play("r6")
 
     print(game.id)
-    copy_database(conn, f"logs/{datetime.datetime.now().isoformat()}.db")
+    #copy_database(conn, f"logs/{datetime.datetime.now().isoformat()}.db")
