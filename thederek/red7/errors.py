@@ -1,0 +1,2 @@
+class GameLogicError(RuntimeError):
+    pass

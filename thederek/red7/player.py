@@ -1,19 +1,22 @@
-import sqlite3
+from dataclasses import dataclass
 
-from thederek.red7 import Cards
+from thederek.red7.cards import Cards, Card
+from thederek.red7.errors import GameLogicError
 
 
+@dataclass
 class Player:
-    def __init__(self, position: int, hand: Cards, palette: Cards):
-        self.position: int = position
-        self.hand: Cards = hand
-        self.palette: Cards = palette
+    position: int
+    hand: Cards
+    palette: Cards
 
-    def create(self, cursor: sqlite3.Cursor):
-        cursor.execute(
-            "INSERT INTO player (game_id, position, hand, palette) VALUES (?, (select seq from sqlite_sequence where name='game'), ?, ?)",
-            [self.position, repr(self.hand), repr(self.palette)],
-        )
+    def copy(self) -> "Player":
+        return Player(self.position, self.hand.copy(), self.palette.copy())
 
-    def copy(self):
-        return Player(self.position, self.hand, self.palette)
+    def play(self, card: Card) -> "Player":
+        if card not in self.hand:
+            raise GameLogicError("No card in palette")
+
+        new_player = self.copy()
+        new_player.palette.append(new_player.hand.pop())
+        return new_player
