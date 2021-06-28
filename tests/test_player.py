@@ -14,6 +14,7 @@ def test_play():
     assert new_player.hand == Cards([Card(7, Colour.RED)])
     assert new_player.palette == Cards([Card(3, Colour.GREEN), Card(4, Colour.BLUE)])
 
+
 def test_play_invalid_card():
     player = Player(
         0,
