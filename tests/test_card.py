@@ -5,7 +5,7 @@ def test_get_cards():
     cards = get_cards("r7b1y3")
 
     assert cards == Cards(
-        [Card(7, Colour.RED), Card(1, Colour.BLUE), Card(3, Colour.YELLOW)]
+        frozenset([Card(7, Colour.RED), Card(1, Colour.BLUE), Card(3, Colour.YELLOW)])
     )
 
 

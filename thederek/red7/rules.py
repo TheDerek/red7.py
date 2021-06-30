@@ -9,18 +9,21 @@ def highest_card(players: list[Player]) -> Player:
 
 
 def most_of_one_number(players: list[Player]):
-    def most(player: Player) -> tuple(int, Card):
-        # Find the most common number in the players palette
-        most_common_number: int = Counter(
-            [card.number for card in player.palette]
-        ).most_common(1)[0][0]
+    def most(player: Player) -> tuple[int, Card]:
+        """Find the most common number in the players palette"""
+
+        # We sort the result of Counter just incase the numbers are aunique, in which case
+        # the result will be the single greatest number in the players palette
+        most_common_number, freq = sorted(
+            Counter([card.number for card in player.palette]).most_common(1)
+        )[0]
 
         # Find the highest card that has that number
         highest_card = max(
             [card for card in player.palette if card.number == most_common_number]
         )
 
-        return most_common_number, highest_card
+        return freq, highest_card
 
     values = {player: most(player) for player in players}
     return max(players, key=lambda p: values[p])

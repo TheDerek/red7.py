@@ -1,52 +1,31 @@
 from unittest.mock import Mock
 import pytest
+import random
 
 from thederek.red7 import rules
-from thederek.red7.cards import get_cards
+from thederek.red7.cards import get_cards, Cards
 from thederek.red7.player import Player
 
 
 def get_player(cards: str):
-    player = Mock(spec=Player)
-    player.palette = get_cards(cards)
-    return player
+    return Player(0, Cards([]), get_cards(cards))
 
 
 @pytest.mark.parametrize(
-    "palette_winner,palette_loser,rule",
+    "hands, rule",
     [
-        ("r7b3r1", rules.highest_card),
-        (
-            ["red1", "red2", "violet4"],
-            ["blue1", "blue2", "blue3"],
-            rules.most_of_one_number,
-        ),
-        (
-            ["blue2", "red2", "violet4"],
-            ["blue1", "red1", "blue3"],
-            rules.most_of_one_number,
-        ),
+        (["r7b3r1", "r6b2", "y1", "g5b1"], rules.highest_card),
+        (["o3y7", "r6b2", "y1", "g5b1"], rules.highest_card),
+        (["o1b1r1r3", "o3r5r7r1b3", "b1v5r2", "g5b1"], rules.most_of_one_number),
+        (["v3b1r1r3", "o3r5r7r1b3", "b1v5r2", "g5b1"], rules.most_of_one_number),
     ],
 )
-def test_rules(palette_winner, palette_loser, rule):
-    palette_winner = [cards[card_name] for card_name in palette_winner]
-    palette_loser = [cards[card_name] for card_name in palette_loser]
+def test_rules(hands, rule):
+    players = [get_player(hand) for hand in hands]
 
-    assert rule(palette_winner, palette_loser) == palette_winner
-    assert rule(palette_loser, palette_winner) == palette_winner
+    # The first player in the list is the winning player, however we want to shuffle the
+    # list so that to ensure the rule is not biased towards player position
+    winner = players[0]
+    random.shuffle(players)
 
-
-@pytest.mark.parametrize(
-    "palette,freq,highest_card",
-    [
-        (["blue1", "blue2", "yellow1", "yellow2", "yellow3"], 2, "yellow2"),
-        (["blue1", "red1", "yellow1", "blue2", "violet2"], 3, "red1"),
-        (["orange2", "yellow2", "red2"], 3, "red2"),
-        (["orange4", "yellow3", "red2"], 1, "orange4"),
-    ],
-)
-def test_most_of_one_number_in_palette(palette, freq, highest_card):
-    palette = [cards[card_name] for card_name in palette]
-    highest_card = cards[highest_card]
-
-    assert rules._most_of_one_number_in_palette(palette) == (freq, highest_card)
+    assert rule(players) == winner

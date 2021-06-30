@@ -32,7 +32,7 @@ class Card(NamedTuple):
         return f"{self.colour.name[0].lower()}{self.number}"
 
 
-Cards = list[Card]
+Cards = frozenset[Card]
 
 
 def get_deck() -> Cards:
@@ -45,7 +45,7 @@ def get_deck() -> Cards:
     return cards
 
 
-def get_cards(source: str) -> list[Card]:
+def get_cards(source: str) -> Cards:
     cards = []
 
     if len(source) % 2 != 0:
@@ -56,4 +56,4 @@ def get_cards(source: str) -> list[Card]:
         number = source[(i * 2) + 1]
         cards.append(Card(int(number), COLOUR_MAPPINGS[colour]))
 
-    return cards
+    return frozenset(cards)
