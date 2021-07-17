@@ -1,24 +1,29 @@
-import PhaserLogo from '../objects/phaserLogo'
-import FpsText from '../objects/fpsText'
+import PhaserLogo from "../objects/phaserLogo"
+import FpsText from "../objects/fpsText"
+import Card from "../objects/card"
 
 export default class MainScene extends Phaser.Scene {
-  fpsText
+  fpsText: FpsText
+  frames: string[]
 
   constructor() {
-    super({ key: 'MainScene' })
+    super({ key: "MainScene" })
   }
 
   create() {
-    new PhaserLogo(this, this.cameras.main.width / 2, 0)
     this.fpsText = new FpsText(this)
 
     // display the Phaser.VERSION
     this.add
       .text(this.cameras.main.width - 15, 15, `Phaser v${Phaser.VERSION}`, {
-        color: '#000000',
-        fontSize: '24px'
+        color: "#000000",
+        fontSize: "24px"
       })
       .setOrigin(1, 0)
+
+    var cardNames = this.textures.get("cards").getFrameNames().slice(0, -1);
+    console.log(cardNames);
+    new Card(this, 100, 500, "v3");
   }
 
   update() {
