@@ -1,13 +1,12 @@
-import PhaserLogo from "../objects/phaserLogo"
-import FpsText from "../objects/fpsText"
-import Card from "../objects/card"
+import FpsText from '../objects/fpsText'
+import Card from '../objects/card'
 
 export default class MainScene extends Phaser.Scene {
   fpsText: FpsText
   frames: string[]
 
   constructor() {
-    super({ key: "MainScene" })
+    super({ key: 'MainScene' })
   }
 
   create() {
@@ -16,14 +15,27 @@ export default class MainScene extends Phaser.Scene {
     // display the Phaser.VERSION
     this.add
       .text(this.cameras.main.width - 15, 15, `Phaser v${Phaser.VERSION}`, {
-        color: "#000000",
-        fontSize: "24px"
+        color: '#000000',
+        fontSize: '24px'
       })
       .setOrigin(1, 0)
 
-    var cardNames = this.textures.get("cards").getFrameNames().slice(0, -1);
-    console.log(cardNames);
-    new Card(this, 100, 500, "v3");
+    var cardNames = this.textures.get('cards').getFrameNames().slice(0, -1)
+    // @ts-ignore
+    Phaser.Actions.Shuffle(cardNames)
+    console.log(cardNames)
+
+    var cards: Card[] = cardNames.map(
+      name => new Card(this, Phaser.Math.FloatBetween(100, 150), Phaser.Math.FloatBetween(500, 550))
+    )
+
+    cards.reverse().forEach((card, index) => {
+      this.tweens.add({
+        targets: card,
+        x: { value: 1100, duration: 1500, ease: 'Power2' },
+        delay: index * 100
+      })
+    })
   }
 
   update() {

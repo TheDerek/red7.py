@@ -1,32 +1,32 @@
 export default class Card extends Phaser.GameObjects.Image {
-    faceUp: boolean = true;
-    cardName: string;
+    faceUp: boolean = false;
 
-    constructor(scene, x, y, cardName: string) {
-        super(scene, x, y, "cards", cardName);
+    constructor(scene, x, y) {
+        super(scene, x, y, "cards", "back");
 
         scene.add.existing(this);
         this.setInteractive();
         this.setScale(0.3);
-        this.cardName = cardName;
 
-        this.on("pointerdown", (pointer) => this.flip());
+        this.on("pointerdown", (pointer) => this.move());
     }
-    flip() {
-        console.log("Flippy flippy?");
+    flip(cardName?: string) {
         //  Will contain the top-most Game Object (in the display list)
+
+        if (cardName) {
+            this.setTexture("cards", cardName);
+            this.faceUp = true;
+        }
+        else {
+            this.setTexture("cards", "back");
+            this.faceUp = false;
+        }
+    }
+
+    move() {
         this.scene.tweens.add({
             targets: this,
             x: { value: 1100, duration: 1500, ease: 'Power2' },
         });
-        if (this.faceUp) {
-            this.setTexture("cards", "back");
-        } else {
-            console.log(this.cardName);
-            this.setTexture("cards", this.cardName);
-        }
-
-        this.faceUp = !this.faceUp;
-
     }
 }

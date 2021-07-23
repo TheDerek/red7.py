@@ -56,6 +56,8 @@
     "workbox-webpack-plugin": "^6.0.2"
   },
   "dependencies": {
-    "phaser": "^3.53.1"
+    "@types/react-redux": "^7.1.18",
+    "phaser": "^3.53.1",
+    "redux": "^4.1.0"
   }
 }
