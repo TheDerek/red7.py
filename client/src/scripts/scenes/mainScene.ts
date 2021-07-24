@@ -33,7 +33,8 @@ export default class MainScene extends Phaser.Scene {
       this.tweens.add({
         targets: card,
         x: { value: 1100, duration: 1500, ease: 'Power2' },
-        delay: index * 100
+        delay: index * 100,
+        onComplete: () => console.log("Completed! " + card)
       })
     })
   }
