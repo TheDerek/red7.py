@@ -27,14 +27,28 @@ type Actions =
     | DiscardCardAction
     | AddCardAction;
 
+type Opponent = {
+    palette: Card[],
+    hand: integer
+}
+
 type GameState = {
     hand: Card[],
-    palette: Card[]
+    palette: Card[],
+    canvas: Card,
+    opponents: Opponent[]
 }
 
 const initialState: GameState = {
     hand: ["i5", "b5", "o6"],
-    palette: ["b4", "g5"]
+    palette: ["b4", "g5"],
+    canvas: "r7",
+    opponents: [
+        {
+            palette: ["r7", "b3"],
+            hand: 7
+        }
+    ]
 };
 
 function reducer(state: GameState = initialState, action: Actions): GameState {

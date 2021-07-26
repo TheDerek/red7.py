@@ -1,12 +1,13 @@
 export default class Card extends Phaser.GameObjects.Image {
     faceUp: boolean = false;
 
-    constructor(scene, x, y) {
+    constructor(scene, x, y, angle=0) {
         super(scene, x, y, "cards", "back");
 
         scene.add.existing(this);
         this.setInteractive();
         this.setScale(0.3);
+        this.angle = angle;
 
         //this.on("pointerdown", (pointer) => this.move());
     }
