@@ -8,11 +8,12 @@ export default class MainScene extends Phaser.Scene {
     store: typeof store;
     cardNames: string[];
     hand: Phaser.GameObjects.Group;
+    spacebar
 
     constructor() {
         super({ key: "MainScene" });
         this.store = store;
-        this.store.subscribe(this.renderStatechange);
+        this.store.subscribe(this.renderStatechange.bind(this));
     }
 
     renderStatechange() {
@@ -20,6 +21,7 @@ export default class MainScene extends Phaser.Scene {
         console.log("Rendering state change!");
 
         // Render the players hand
+        this.hand.clear(true, true);
         var margin = 10.0;
         var width = this.textures.get("cards").frames["r1"].width * 0.3;
         var height = this.textures.get("cards").frames["r1"].height * 0.3;
@@ -41,6 +43,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.renderStatechange();
 
+        this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         // display the Phaser.VERSION
         this.add
             .text(
@@ -79,5 +82,9 @@ export default class MainScene extends Phaser.Scene {
 
     update() {
         this.fpsText.update();
+        if (Phaser.Input.Keyboard.JustDown(this.spacebar)) {
+            console.log("JUTS DOWWWN");
+            this.store.dispatch({type: "ADD_CARD", card: "r7"});
+        }
     }
 }

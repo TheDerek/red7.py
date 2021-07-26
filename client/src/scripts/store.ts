@@ -2,6 +2,7 @@ import { createStore, Store } from 'redux';
 
 const PLAY_CARD = "PLAY_CARD";
 const DISCARD_CARD = "DISCARD_CARD";
+const ADD_CARD = "ADD_CARD";
 
 type Card = "v1" | "i1" | "b1" | "g1" | "y1" | "o1" | "r1" | "v2" | "i2" | "b2" | "g2" | "y2" | "o2" | "r2" | "v3" | "i3" | "b3" | "g3" | "y3" | "o3" | "r3" | "v4" | "i4" | "b4" | "g4" | "y4" | "o4" | "r4" | "v5" | "i5" | "b5" | "g5" | "y5" | "o5" | "r5" | "v6" | "i6" | "b6" | "g6" | "y6" | "o6" | "r6" | "v7" | "i7" | "b7" | "g7" | "y7" | "o7" | "r7";
 
@@ -13,12 +14,18 @@ interface PlayCardAction {
 
 interface DiscardCardAction {
     type: typeof DISCARD_CARD,
-    discardCard: Card
+    card: Card
+}
+
+interface AddCardAction {
+    type: typeof ADD_CARD,
+    card: Card
 }
 
 type Actions =
     | PlayCardAction
-    | DiscardCardAction;
+    | DiscardCardAction
+    | AddCardAction;
 
 type GameState = {
     hand: Card[],
@@ -36,6 +43,14 @@ function reducer(state: GameState = initialState, action: Actions): GameState {
             break;
         case DISCARD_CARD:
             break;
+        case ADD_CARD:
+            return {
+                ...state,
+                hand: [
+                    ...state.hand,
+                    action.card
+                ]
+        }
     }
 
     return state;
