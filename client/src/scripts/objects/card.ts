@@ -8,7 +8,7 @@ export default class Card extends Phaser.GameObjects.Image {
         this.setInteractive();
         this.setScale(0.3);
 
-        this.on("pointerdown", (pointer) => this.move());
+        //this.on("pointerdown", (pointer) => this.move());
     }
     flip(cardName?: string) {
         //  Will contain the top-most Game Object (in the display list)
