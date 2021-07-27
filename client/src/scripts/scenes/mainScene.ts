@@ -10,6 +10,7 @@ export default class MainScene extends Phaser.Scene {
     hand: Phaser.GameObjects.Group;
     opponents: Phaser.GameObjects.Group;
     deck: Card;
+    canvas: Card;
     spacebar;
 
     constructor() {
@@ -29,7 +30,7 @@ export default class MainScene extends Phaser.Scene {
         var iX =
             this.cameras.main.width / 2.0 -
             ((newState.hand.length - 1) * (width + margin)) / 2.0;
-        let y = this.cameras.main.height - margin*3;
+        let y = this.cameras.main.height - margin * 3;
 
         newState.hand.forEach((cardName, index) => {
             let x = iX + index * (width + margin);
@@ -41,7 +42,7 @@ export default class MainScene extends Phaser.Scene {
         iX =
             this.cameras.main.width / 2.0 -
             ((newState.palette.length - 1) * (width + margin)) / 2.0;
-        y = this.cameras.main.height - width*1.5 - margin*3;
+        y = this.cameras.main.height - width * 1.5 - margin * 3;
 
         newState.palette.forEach((cardName, index) => {
             let x = iX + index * (width + margin);
@@ -64,7 +65,7 @@ export default class MainScene extends Phaser.Scene {
             this.opponents.add(card);
         }
         // Render visible palette
-        y = width * 1.5
+        y = width * 1.5;
         iX =
             this.cameras.main.width / 2.0 -
             ((opponent.palette.length - 1) * (width + margin)) / 2.0;
@@ -74,6 +75,29 @@ export default class MainScene extends Phaser.Scene {
             card.flip(cardName);
             this.opponents.add(card);
         });
+
+        // Render the deck
+        if (this.deck) {
+            this.deck.destroy(true);
+        }
+        this.deck = new Card(
+            this,
+            this.cameras.main.width / 2.0 -(height + margin)/2.0,
+            this.cameras.main.height / 2.0 - 15,
+            90
+        );
+
+        // Render the canvas
+        if (this.canvas) {
+            this.canvas.destroy(true);
+        }
+        this.canvas = new Card(
+            this,
+            this.cameras.main.width / 2.0 +(height + margin)/2.0,
+            this.cameras.main.height / 2.0 - 15,
+            90
+        );
+        this.canvas.flip(newState.canvas);
     }
 
     create() {
@@ -87,9 +111,6 @@ export default class MainScene extends Phaser.Scene {
             Phaser.Input.Keyboard.KeyCodes.SPACE
         );
 
-        this.deck = new Card(this, this.cameras.main.width/2.0, this.cameras.main.height/2.0);
-
-        // display the Phaser.VERSION
         this.add
             .text(
                 this.cameras.main.width - 15,
